@@ -1,0 +1,101 @@
+---
+title: "Climate-Resilient Seeds RCT: Impacts on Adoption and Farmer Earnings"
+author: Josahn Oginga, Helen Wang, Marilyn Rutecki, Samantha Rudravajhala , & Cassie
+  Zhang
+date: "2025-05-01"
+output: html_document
+---
+
+### Preparation
+
+```{r setup, include=FALSE}
+# Load packages used in this session of R
+library(tidyverse)
+library(here)
+library(knitr)
+library(dplyr)
+library(lmtest)
+library(sandwich)
+library(fBasics)
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(datasets)
+library(haven)
+library(xtable)
+library(car)
+library(statar)
+library(stargazer)
+library(fixest)
+library(broom)
+
+#knit here
+knitr::opts_knit$set(root.dir = here::here())
+
+
+```
+
+
+```{r tidy = FALSE}
+#load the data
+
+data <- read.csv("final_data_2.csv")
+
+#get rows and column of data, and preview of the data 
+dim(data)
+head(data)
+
+
+```
+
+
+### Validity and RCT experiment design check 
+
+a) Is attrition a concern? 
+```{r tidy = FALSE}
+#
+
+
+
+```
+
+
+b) Are observables balanced across treatment and control groups?
+```{r tidy = FALSE}
+#
+
+
+
+```
+
+
+c) Were there any peer effects to farmers who were not offered the climate-robust seeds?
+
+
+```{r tidy = FALSE}
+#
+
+
+
+```
+
+
+### Treatment effects 
+
+a) Did treatment increase use of seeds 
+
+```{r tidy = FALSE}
+#
+
+
+
+```
+
+b) Did use of seeds increase earnings 
+
+```{r tidy = FALSE}
+#
+
+
+
+```
