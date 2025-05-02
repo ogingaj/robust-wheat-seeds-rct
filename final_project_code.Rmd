@@ -53,9 +53,27 @@ head(data)
 
 a) Is attrition a concern? 
 ```{r tidy = FALSE}
+#check for missing data 
+colSums(is.na(data))
+#create attrition indicator binary 
+data$attrition <- ifelse(is.na(data$lnearnings), 1, 0)
+#difference in attrition rates
+
+#check attrition by covariates 
+summary(lm(attrition ~ hhld_size + age_head_hhld + married + lnearnings, data = data))
+
+
+```
+
+
+```{r tidy = FALSE}
 #
 
+#show results of attrition 
+#summary(lm(attrition ~ treatment, data = data))
 
+#check attrition by town group
+summary(lm(attrition ~ factor(town_group), data = data))
 
 ```
 
@@ -63,7 +81,10 @@ a) Is attrition a concern?
 b) Are observables balanced across treatment and control groups?
 ```{r tidy = FALSE}
 #
-
+#check balance 
+checkbal <- lm(treatment ~ hhld_size + age_head_hhld + married + lnearnings, data = data)
+#show results
+summary(checkbal)
 
 
 ```
@@ -73,8 +94,50 @@ c) Were there any peer effects to farmers who were not offered the climate-robus
 
 
 ```{r tidy = FALSE}
-#
+#peer effects based on town groups
+data_non_offered <- data %>% filter(treatment == 0)
+#regress and show results 
+peer_effect_model <- lm(lnearnings ~ factor(town_group), data = data_non_offered)
+#results
+summary(peer_effect_model)
 
+
+```
+```{r tidy = FALSE}
+##view results with robust standard errors
+coeftest(peer_effect_model, vcov = vcovHC(peer_effect_model, type = "HC1"))
+```
+
+
+Plotted results
+```{r tidy = FALSE}
+#plot the peer effects
+data_non_offered %>% 
+  group_by(town_group) %>% 
+  summarise(
+    avg_earnings = mean(lnearnings, na.rm = TRUE),
+    se = sd(lnearnings, na.rm = TRUE) / sqrt(n()),
+    ci_lower = avg_earnings - 1.96 * se,
+    ci_upper = avg_earnings + 1.96 * se
+  ) %>%
+  # Convert town_group to fraction
+  ggplot(aes(x = case_when(
+               town_group == 0 ~ 0.00,
+               town_group == 1 ~ 0.25,
+               town_group == 2 ~ 0.50,
+               town_group == 3 ~ 0.75
+             ), 
+             y = avg_earnings)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.03, color = "steelblue") +
+  geom_line(color = "steelblue", linetype = "dashed") +
+  labs(
+    title = "Earnings of Non-Treated Farmers by Town Treatment Intensity",
+    x = "Fraction of Farmers Offered Seeds in Town",
+    y = "Average Earnings (ln)"
+  ) +
+  scale_x_continuous(labels = scales::percent, breaks = c(0, 0.25, 0.50, 0.75)) +
+  theme_minimal()
 
 
 ```
@@ -86,9 +149,6 @@ a) Did treatment increase use of seeds
 
 ```{r tidy = FALSE}
 #
-
-
-
 ```
 
 b) Did use of seeds increase earnings 
