@@ -28,6 +28,7 @@ library(statar)
 library(stargazer)
 library(fixest)
 library(broom)
+library(miceadds)
 
 #knit here
 knitr::opts_knit$set(root.dir = here::here())
@@ -100,10 +101,6 @@ data_non_offered <- data %>% filter(treatment == 0)
 peer_effect_model <- lm(lnearnings ~ factor(town_group), data = data_non_offered)
 #results
 summary(peer_effect_model)
-
-
-```
-```{r tidy = FALSE}
 ##view results with robust standard errors
 coeftest(peer_effect_model, vcov = vcovHC(peer_effect_model, type = "HC1"))
 ```
@@ -148,14 +145,73 @@ data_non_offered %>%
 a) Did treatment increase use of seeds 
 
 ```{r tidy = FALSE}
-#
+#unclustered
+seed_mod <- lm(uses_new_seeds ~ treatment, data)
+seed_mod %>% summary()
+
+#with clustered se
+seed_mod_cluster <- lm.cluster(uses_new_seeds ~ treatment, data = data, cluster = "town_id")
+seed_mod_cluster %>% summary() 
+
+#Being in the treatment group is linked to a significant 59% point increase in the likelihood of using new seeds
+
 ```
+```{r}
+#visualization
+data.frame(group = names(coef(seed_mod_cluster)), 
+           estimate = coef(seed_mod_cluster),
+           se =  summary(seed_mod_cluster)[,2]) %>%
+  mutate(group = ifelse(group == "(Intercept)", "Control", "Treatment"),
+         ci_lo = estimate - 1.96 * se,
+         ci_up = estimate + 1.96 * se
+         ) %>%
+  ggplot(aes(x = group, y = estimate)) +
+  geom_point(color = "steelblue") +
+  geom_line(group = 1, color = "steelblue") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_up), 
+                width = 0.03, color = "steelblue") +
+  theme_minimal() +
+  labs(x = "Group", y = "Estimate",
+       title= "Treatment Effects on Seed Use") +
+  theme_minimal() 
+```
+
 
 b) Did use of seeds increase earnings 
 
 ```{r tidy = FALSE}
-#
+#unclustered
+seed_earning_mod <- lm(lnearnings ~ uses_new_seeds, data)
+seed_earning_mod %>% summary()
 
+#with clustered se
+seed_earning_mod_clustered <- lm.cluster(lnearnings ~ uses_new_seeds, data = data, cluster = "town_id")
+seed_earning_mod_clustered %>% summary()
 
+#Using new seeds is associated with a significant 25% increase in earnings
+```
+```{r}
+#visualizations
+data %>%
+  filter(!is.na(uses_new_seeds)) %>%
+  mutate(uses_new_seeds = ifelse(uses_new_seeds == 0, "No", "Yes")) %>%
+  group_by(uses_new_seeds) %>%
+  summarise(mean_lnearnings = mean(lnearnings, na.rm = T),
+            sd_lnearnings = sd(lnearnings, na.rm = T),
+            n = n()) %>%
+  mutate(se = sd_lnearnings/sqrt(n),
+         ci_lo = mean_lnearnings - 1.96 * se,
+         ci_up = mean_lnearnings + 1.96 * se
+         ) %>%
+  ggplot(aes(x = uses_new_seeds, y = mean_lnearnings)) +
+  geom_point(color = "steelblue") +
+  geom_line(group = 1, color = "steelblue") +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_up), 
+                width = 0.03, color = "steelblue") +
+  theme_minimal() +
+  labs(x = "Uses New Seed?", y = "Average Earnings (ln)",
+       title= "Earnings by New Seed Usage") 
 
 ```
+
+
