@@ -11,29 +11,13 @@ output: html_document
 ```{r setup, include=FALSE}
 # Load packages used in this session of R
 library(tidyverse)
-library(here)
-library(knitr)
-library(dplyr)
 library(lmtest)
 library(sandwich)
-library(fBasics)
 library(ggplot2)
-library(grid)
-library(gridExtra)
-library(datasets)
-library(haven)
-library(xtable)
-library(car)
-library(statar)
-library(stargazer)
-library(fixest)
-library(broom)
 library(miceadds)
 
 #knit here
 knitr::opts_knit$set(root.dir = here::here())
-
-
 ```
 
 
