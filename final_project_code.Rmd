@@ -45,11 +45,12 @@ data$attrition <- ifelse(is.na(data$lnearnings), 1, 0)
 #difference in attrition rates
 
 #check attrition by covariates 
-summary(lm(attrition ~ hhld_size + age_head_hhld + married + lnearnings, data = data))
+summary(lm(attrition ~ hhld_size + age_head_hhld + married, data = data))
 
 
 ```
 
+Check attrition by treatment status and treatment group
 
 ```{r tidy = FALSE}
 #show results of attrition by treatment status 
@@ -64,7 +65,7 @@ summary(lm(attrition ~ factor(town_group), data = data))
 b) Are observables balanced across treatment and control groups?
 ```{r tidy = FALSE}
 #check balance 
-checkbal <- lm(treatment ~ hhld_size + age_head_hhld + married + lnearnings, data = data)
+checkbal <- lm(treatment ~ hhld_size + age_head_hhld + married, data = data)
 #show results
 summary(checkbal)
 
