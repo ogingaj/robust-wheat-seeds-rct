@@ -52,10 +52,8 @@ summary(lm(attrition ~ hhld_size + age_head_hhld + married + lnearnings, data = 
 
 
 ```{r tidy = FALSE}
-#
-
-#show results of attrition 
-#summary(lm(attrition ~ treatment, data = data))
+#show results of attrition by treatment status 
+summary(lm(attrition ~ treatment, data = data))
 
 #check attrition by town group
 summary(lm(attrition ~ factor(town_group), data = data))
@@ -65,7 +63,6 @@ summary(lm(attrition ~ factor(town_group), data = data))
 
 b) Are observables balanced across treatment and control groups?
 ```{r tidy = FALSE}
-#
 #check balance 
 checkbal <- lm(treatment ~ hhld_size + age_head_hhld + married + lnearnings, data = data)
 #show results
@@ -137,9 +134,12 @@ seed_mod %>% summary()
 seed_mod_cluster <- lm.cluster(uses_new_seeds ~ treatment, data = data, cluster = "town_id")
 seed_mod_cluster %>% summary() 
 
-#Being in the treatment group is linked to a significant 59% point increase in the likelihood of using new seeds
+
 
 ```
+
+Being in the treatment group is linked to a significant 59% point increase in the likelihood of using new seeds
+
 ```{r}
 #visualization
 data.frame(group = names(coef(seed_mod_cluster)), 
@@ -174,6 +174,9 @@ seed_earning_mod_clustered %>% summary()
 
 #Using new seeds is associated with a significant 25% increase in earnings
 ```
+
+
+
 ```{r}
 #visualizations
 data %>%
